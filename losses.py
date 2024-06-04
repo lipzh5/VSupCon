@@ -17,6 +17,7 @@ class SupConLoss(nn.Module):
         self.temperature = temperature
         self.contrast_mode = contrast_mode
         self.base_temperature = base_temperature
+        self.device_id = device_id
 
     def forward(self, features, labels=None, mask=None):
         """Compute loss for model. If both `labels` and `mask` are None,
@@ -31,7 +32,7 @@ class SupConLoss(nn.Module):
         Returns:
             A loss scalar.
         """
-        device = torch.device(f'cuda:{device_id}') if device_id > 0 else torch.device('cpu')
+        device = torch.device(f'cuda:{self.device_id}') if self.device_id > 0 else torch.device('cpu')
         # device = (torch.device('cuda')
         #           if features.is_cuda
         #           else torch.device('cpu'))
