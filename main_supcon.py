@@ -209,7 +209,8 @@ def set_loader(opt):
 
 def set_model(opt):
     model = SupConResNet(name=opt.model)
-    criterion = SupConLoss(temperature=opt.temp)
+    device_id = opt.device_ids[0]
+    criterion = SupConLoss(temperature=opt.temp, device_id=device_id)
 
     # enable synchronized Batch Normalization
     if opt.syncBN:
@@ -218,7 +219,6 @@ def set_model(opt):
     if torch.cuda.is_available():
         # if torch.cuda.device_count() > 1:
         #     model.encoder = torch.nn.DataParallel(model.encoder, opt.device_ids)
-        device_id = opt.device_ids[0]
         model = model.cuda(device_id)
         criterion = criterion.cuda(device_id)
         cudnn.benchmark = True
