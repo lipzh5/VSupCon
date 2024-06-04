@@ -143,8 +143,8 @@ def set_loader(opt):
     elif opt.dataset == 'affwild2':   
         mean = (0.4654, 0.3532, 0.3217)
         std = (0.2334, 0.2003, 0.1902)
-        if opt.model in {'resnet50', }:
-            assert opt.size == 112, "picture size must be 112 for affwild2"
+        # if opt.model in {'resnet50', }:
+        #     assert opt.size == 112, "picture size must be 112 for affwild2"
     elif opt.dataset == 'path':
         mean = eval(opt.mean)
         std = eval(opt.std)
