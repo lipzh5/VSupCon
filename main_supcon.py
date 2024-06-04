@@ -218,8 +218,9 @@ def set_model(opt):
     if torch.cuda.is_available():
         # if torch.cuda.device_count() > 1:
         #     model.encoder = torch.nn.DataParallel(model.encoder, opt.device_ids)
-        model = model.cuda(opt.device_ids[0])
-        criterion = criterion.cuda(opt.device_ids[0])
+        device_id = opt.device_ids[0]
+        model = model.cuda(device_id)
+        criterion = criterion.cuda(device_id)
         cudnn.benchmark = True
 
     return model, criterion
@@ -232,8 +233,9 @@ def validate(val_loader, model, criterion, opt):
     for idx, (images, labels) in enumerate(val_loader):
         images = torch.cat([images[0], images[1]], dim=0)
         if torch.cuda.is_available():
-            images = images.cuda(non_blocking=True)
-            labels = labels.cuda(non_blocking=True)
+            device_id = opt.device_ids[0]
+            images = images.cuda(device=device_id, non_blocking=True)
+            labels = labels.cuda(device=device_id, non_blocking=True)
         bsz = labels.shape[0]
         # compute loss
         features = model(images)
@@ -267,8 +269,9 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
 
         images = torch.cat([images[0], images[1]], dim=0)
         if torch.cuda.is_available():
-            images = images.cuda(non_blocking=True)
-            labels = labels.cuda(non_blocking=True)
+            device_id = opt.device_ids[0]
+            images = images.cuda(device=device_id, non_blocking=True)
+            labels = labels.cuda(device=device_id, non_blocking=True)
         bsz = labels.shape[0]
 
         # warm-up learning rate
