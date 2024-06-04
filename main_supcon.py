@@ -79,6 +79,7 @@ def parse_option():
                         help='warm-up for large batch training')
     parser.add_argument('--trial', type=str, default='0',
                         help='id for recording multiple runs')
+    parser.add_argument('--device_ids', default='1,2')
 
     opt = parser.parse_args()
 
@@ -98,6 +99,9 @@ def parse_option():
     opt.lr_decay_epochs = list([])
     for it in iterations:
         opt.lr_decay_epochs.append(int(it))
+    
+    device_ids = opt.device_ids.split(',')
+    opt.device_ids = [int(it) for it in device_ids]
 
     opt.model_name = '{}_{}_{}_lr_{}_decay_{}_bsz_{}_temp_{}_trial_{}'.\
         format(opt.method, opt.dataset, opt.model, opt.learning_rate,
@@ -213,7 +217,7 @@ def set_model(opt):
 
     if torch.cuda.is_available():
         if torch.cuda.device_count() > 1:
-            model.encoder = torch.nn.DataParallel(model.encoder)
+            model.encoder = torch.nn.DataParallel(model.encoder, opt.device_ids)
         model = model.cuda()
         criterion = criterion.cuda()
         cudnn.benchmark = True
