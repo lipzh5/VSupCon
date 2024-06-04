@@ -88,8 +88,9 @@ class AffwildDataset(Dataset):
         return out_list
 
 
+cwd = osp.abspath(osp.dirname(__file__))
 def get_affwild2_dataset(split, transform_ops):
-    root_path = '/home/penny/pycharmprojects/common/data/aff-wild2'
+    root_path = osp.join(cwd, '../../common/data/aff-wild2') # '/home/penny/pycharmprojects/common/data/aff-wild2'
     data_list_dir = osp.join(root_path, 'preprocessed_data')
     data_folder = osp.join(root_path, 'cropped_all/cropped_aligned')
     anno_folder = osp.join(root_path, '5th_ABAW_Annotations/EXPR_Classification_Challenge')
