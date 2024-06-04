@@ -163,8 +163,9 @@ def set_loader(opt):
         normalize,
     ])
 
-    val_transform = transforms.Compose([
-        transforms.RandomResizedCrop(size=opt.size, scale=(0.2, 1.)),  # TODO delete
+    trans_list = [transforms.Resize(size=opt.size),] if opt.model=='inceptionresnetv1' else [] 
+    val_transform = transforms.Compose(
+        trans_list + [
         transforms.ToTensor(),
         normalize,
     ])
