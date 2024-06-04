@@ -218,8 +218,8 @@ def set_model(opt):
     if torch.cuda.is_available():
         if torch.cuda.device_count() > 1:
             model.encoder = torch.nn.DataParallel(model.encoder, opt.device_ids)
-        model = model.cuda()
-        criterion = criterion.cuda()
+        model = model.cuda(opt.device_ids[0])
+        criterion = criterion.cuda(opt.device_ids[0])
         cudnn.benchmark = True
 
     return model, criterion
