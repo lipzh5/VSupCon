@@ -42,7 +42,7 @@ def parse_option():
                         help='number of training epochs')
 
     # optimization
-    parser.add_argument('--learning_rate', type=float, default=0.05,
+    parser.add_argument('--learning_rate', type=float, default=0.001, # 0.05 for resnet50; 0.001 for inceptionresnetv1
                         help='learning rate')
     parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900',
                         help='where to decay lr, can be a list')
@@ -71,7 +71,7 @@ def parse_option():
                         help='temperature for loss function')
 
     # other setting
-    parser.add_argument('--cosine', action='store_true',
+    parser.add_argument('--cosine', action='store_true', default=True,
                         help='using cosine annealing')
     parser.add_argument('--syncBN', action='store_true',
                         help='using synchronized batch normalization')
@@ -81,6 +81,8 @@ def parse_option():
                         help='id for recording multiple runs')
     parser.add_argument('--device_ids', default='1,2')
     parser.add_argument('--data_dsr', type=int, default=1, help='data set downsampling ratio, e.g., 1 stands for original, 2 stands for original//2')
+    parser.add_argument('--warmup_from', type=float, default=1e-3)
+    parser.add_argument('--warm_epochs', type=int, default=10)
 
     opt = parser.parse_args()
 
@@ -116,8 +118,8 @@ def parse_option():
         opt.warm = True
     if opt.warm:
         opt.model_name = '{}_warm'.format(opt.model_name)
-        opt.warmup_from = 0.01
-        opt.warm_epochs = 10
+        # opt.warmup_from = 0.01
+        # opt.warm_epochs = 10
         if opt.cosine:
             eta_min = opt.learning_rate * (opt.lr_decay_rate ** 3)
             opt.warmup_to = eta_min + (opt.learning_rate - eta_min) * (
