@@ -3,6 +3,7 @@ import os
 import os.path as osp
 import glob
 from PIL import Image
+import random
 
 # Aff-Wild2 dataset
 # class_names_original = ['Neutral', 'Anger', 'Disgust', 'Fear', 'Happiness', 'Sadness', 'Surprise', 'Other']  #ABAW3的标注
@@ -13,10 +14,12 @@ class_mapping = [0, 6, 5, 2, 4, 3, 1, 7]
 
 class AffwildDataset(Dataset): 
     """load aff-wild2 dataset"""
-    def __init__(self, data_list_dir, file_folder, anno_folder, split='train', transform_ops=None):
+    def __init__(self, data_list_dir, file_folder, anno_folder, split='train', transform_ops=None, downsampling=1):
         super().__init__()
         self.transforms = transform_ops 
         self.file_folder = file_folder
+        self.downsampling = downsampling   # TODO delete later: test data set downsampling to speed up training
+        self.split = split
         # if is_train:
         print('load Aff-Wild2_train...')
         data_list_path = osp.join(data_list_dir, f'{split}_img_path_list.txt')
@@ -29,6 +32,12 @@ class AffwildDataset(Dataset):
             print(f'  - Loading data list form: {data_list_path}')
             with open(data_list_path, 'r') as infile:
                 self.data_list = [t.split(' ')[:2] for t in infile]   
+            # TODO delete later
+            if self.downsampling > 1:
+                len_selected = len(self.data_list)//self.downsampling
+                random.shuffle(self.data_list)
+                self.data_list = self.data_list[:len_selected]
+                
             return
         print(f'  - Generating data list form: {anno_folder}')
         self.data_list = self.gen_list(file_folder, anno_folder, save_path=data_list_path, class_mapping=class_mapping)
@@ -36,7 +45,7 @@ class AffwildDataset(Dataset):
         print(f'  - Total images: {len(self.data_list)}')
 
     def __len__(self):
-        return len(self.data_list)
+        return len(self.data_list)//self.downsampling
 
     def __getitem__(self, index):
         """load each image"""
@@ -89,9 +98,9 @@ class AffwildDataset(Dataset):
 
 
 cwd = osp.abspath(osp.dirname(__file__))
-def get_affwild2_dataset(split, transform_ops):
+def get_affwild2_dataset(split, transform_ops, downsampling=1):
     root_path = osp.join(cwd, '../../common/data/aff-wild2') # '/home/penny/pycharmprojects/common/data/aff-wild2'
     data_list_dir = osp.join(root_path, 'preprocessed_data')
     data_folder = osp.join(root_path, 'cropped_all/cropped_aligned')
     anno_folder = osp.join(root_path, '5th_ABAW_Annotations/EXPR_Classification_Challenge')
-    return AffwildDataset(data_list_dir, data_folder, anno_folder, split, transform_ops)
+    return AffwildDataset(data_list_dir, data_folder, anno_folder, split, transform_ops, downsampling)

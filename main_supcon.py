@@ -80,6 +80,7 @@ def parse_option():
     parser.add_argument('--trial', type=str, default='0',
                         help='id for recording multiple runs')
     parser.add_argument('--device_ids', default='1,2')
+    parser.add_argument('--data_dsr', type=int, default=1, help='data set downsampling ratio, e.g., 1 stands for original, 2 stands for original//2')
 
     opt = parser.parse_args()
 
@@ -183,8 +184,8 @@ def set_loader(opt):
                                        train=False,
                                        transform=TwoCropTransform(val_transform))  
     elif opt.dataset == 'affwild2':
-        train_dataset = get_affwild2_dataset('train', TwoCropTransform(train_transform))
-        val_dataset = get_affwild2_dataset('val', TwoCropTransform(val_transform))
+        train_dataset = get_affwild2_dataset('train', TwoCropTransform(train_transform), opt.data_dsr)
+        val_dataset = get_affwild2_dataset('val', TwoCropTransform(val_transform), opt.data_dsr)
     elif opt.dataset == 'cifar100':
         train_dataset = datasets.CIFAR100(root=opt.data_folder,
                                           transform=TwoCropTransform(train_transform),
