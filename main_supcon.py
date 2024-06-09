@@ -87,10 +87,6 @@ def parse_option():
 
 	opt = parser.parse_args()
 
-	trial_name = f"lr{opt.learning_rate}_decay{opt.weight_decay}__bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-coswp{opt.warm_epochs}_trial{opt.trial}"
-	writer = SummaryWriter(osp.join('runs',trial_name))
-	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
-
 	# check if dataset is path that passed required arguments
 	if opt.dataset == 'path':
 		assert opt.data_folder is not None \
@@ -212,7 +208,7 @@ def set_loader(opt):
 		val_dataset, batch_size=256, shuffle=False,
 		num_workers=8, pin_memory=True)
 
-	return train_loader, val_loader
+	return train_loader
 
 
 def set_model(opt):
@@ -327,6 +323,9 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 
 def main():
 	opt = parse_option()
+	trial_name = f"lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-coswp{opt.warm_epochs}_trial{opt.trial}"
+	writer = SummaryWriter(osp.join('runs',trial_name))
+	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 
 	# build data loader
 	train_loader, val_loader = set_loader(opt)
