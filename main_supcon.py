@@ -208,7 +208,7 @@ def set_loader(opt):
 		val_dataset, batch_size=256, shuffle=False,
 		num_workers=8, pin_memory=True)
 
-	return train_loader
+	return train_loader, val_loader
 
 
 def set_model(opt):
@@ -296,7 +296,6 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 		# update metric
 		losses.update(loss.item(), bsz)
 
-		# SGD
 		optimizer.zero_grad()
 		loss.backward()
 		# grads = [torch.max(p.grad) for p in model.parameters() if p.grad is not None]
