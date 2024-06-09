@@ -87,7 +87,7 @@ def parse_option():
 
 	opt = parser.parse_args()
 
-	trial_name = f"lr{opt.learning_rate}_decay{opt.weight_decay}__bs{opt.batch_size}_ep{opt.epochs}_opt-SGD_momentum{opt.momentum}_sch-coswp{opt.warm_epochs}_trial{opt.trial}"
+	trial_name = f"lr{opt.learning_rate}_decay{opt.weight_decay}__bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-coswp{opt.warm_epochs}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
 	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 
