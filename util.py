@@ -77,13 +77,48 @@ def warmup_learning_rate(args, epoch, batch_id, total_batches, optimizer):
             param_group['lr'] = lr
 
 
+def get_paramsgroup(opt, model, warmup=False):
+	no_decay = ['bias', 'LayerNorm.weight']
+	pre_train_lr = opt.learning_rate
+	encoder_params = list(map(id, model.encoder.parameters()))
+	params = []
+	warmup_params = []
+	for name, param in model.named_parameters():
+		lr = pre_train_lr * 10
+		weight_decay = opt.weight_decay
+		if id(param) in encoder_params:
+			lr = pre_train_lr
+		if any(nd in name for nd in no_decay):
+			weight_decay = 0
+		params.append({
+			'params': param,
+			'lr': lr,
+			'weight_decay': weight_decay
+		})
+		warmup_params.append({
+			'params':
+			param,
+			'lr':
+			pre_train_lr / 4 if id(param) in encoder_params else lr,
+			'weight_decay':
+			weight_decay
+		})
+	if warmup:
+		return warmup_params
+	params = sorted(params, key=lambda x: x['lr'])
+	return params
+
 def set_optimizer(opt, model):
-    optimizer = optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
-    # optimizer = optim.SGD(model.parameters(),
-    #                       lr=opt.learning_rate,
-    #                       momentum=opt.momentum,
-    #                       weight_decay=opt.weight_decay)
+    # return optim.AdamW(get_paramsgroup(opt, model)) if opt.dflr else optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
+  
+    # optimizer = optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
+    optimizer = optim.SGD(model.parameters(),
+                          lr=opt.learning_rate,
+                          momentum=opt.momentum,
+                          weight_decay=opt.weight_decay)
     return optimizer
+
+
 
 
 def save_model(model, optimizer, opt, epoch, save_file):

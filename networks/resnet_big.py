@@ -151,16 +151,16 @@ def resnet200(**kwargs):
 from facenet_pytorch import InceptionResnetV1
 
 def inceptionresnetv1(**kwargs):
-    return InceptionResnetV1()
+    return InceptionResnetV1() # pretrained='casia-webface' 
 
-
+import torchvision.models as models
 model_dict = {
-    'resnet18': [resnet18, 512],
-    'resnet34': [resnet34, 512],
-    'resnet50': [resnet50, 2048],
-    'resnet101': [resnet101, 2048],
-    'resnet152': [resnet152, 2048],
-    'resnet200': [resnet200, 2048],
+    'resnet18': [models.resnet18, 512],
+    'resnet34': [models.resnet34, 512],
+    'resnet50': [models.resnet50, 1000],
+    'resnet101': [models.resnet101, 2048],
+    'resnet152': [models.resnet152, 2048],
+    # 'resnet200': [resnet200, 2048],
     'inceptionresnetv1': [inceptionresnetv1, 512],
 }
 
@@ -181,7 +181,7 @@ class LinearBatchNorm(nn.Module):
 
 class SupConResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, name='resnet50', head='mlp', feat_dim=128):
+    def __init__(self, name='resnet50', head='mlp', feat_dim=512):
         super(SupConResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()

@@ -19,13 +19,14 @@ from util import set_optimizer, save_model
 from networks.resnet_big import SupConResNet
 from losses import SupConLoss
 import os.path as osp
+import logging
+log = logging.getLogger(__name__)
 try:
 	import apex
 	from apex import amp, optimizers
 except ImportError:
 	pass
-import logging
-log = logging.getLogger(__name__)
+
 
 
 def parse_option():
@@ -84,6 +85,7 @@ def parse_option():
 	parser.add_argument('--data_dsr', type=int, default=1, help='data set downsampling ratio, e.g., 1 stands for original, 2 stands for original//2')
 	parser.add_argument('--warmup_from', type=float, default=1e-3)
 	parser.add_argument('--warm_epochs', type=int, default=10)
+	parser.add_argument('--dflr', action='store_true', default=False, help='whether to use different lr for encoder and head')
 
 	opt = parser.parse_args()
 
@@ -148,9 +150,13 @@ def set_loader(opt):
 	elif opt.dataset == 'cifar100':
 		mean = (0.5071, 0.4867, 0.4408)
 		std = (0.2675, 0.2565, 0.2761)
-	elif opt.dataset == 'affwild2':   
-		mean = (0.4654, 0.3532, 0.3217)
-		std = (0.2334, 0.2003, 0.1902)
+	elif opt.dataset == 'affwild2':  
+		if opt.model == 'inceptionresnetv1': 
+			mean = (0.4654, 0.3532, 0.3217)
+			std = (0.2334, 0.2003, 0.1902)
+		else:  # original size 
+			mean = (0.4652, 0.3531, 0.3215)
+			std = (0.2348, 0.2019, 0.1918)
 		# if opt.model in {'resnet50', }:
 		#     assert opt.size == 112, "picture size must be 112 for affwild2"
 	elif opt.dataset == 'path':
@@ -212,7 +218,7 @@ def set_loader(opt):
 
 
 def set_model(opt):
-	model = SupConResNet(name=opt.model)
+	model = SupConResNet(name=opt.model, feat_dim=512)
 	device_id = opt.device_ids[0]
 	criterion = SupConLoss(temperature=opt.temp, device_id=device_id)
 
@@ -322,9 +328,10 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 
 def main():
 	opt = parse_option()
-	trial_name = f"lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-coswp{opt.warm_epochs}_trial{opt.trial}"
+	trial_name = f"m{opt.model}_lr{opt.learning_rate}_dflr-{opt.dflr}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
 	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
+	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 
 	# build data loader
 	train_loader, val_loader = set_loader(opt)
@@ -335,7 +342,7 @@ def main():
 	# build optimizer
 	optimizer = set_optimizer(opt, model)
 	total_steps = len(train_loader) * opt.epochs
-	scheduler = transformers.get_cosine_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
+	scheduler = transformers.get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
 
 	# tensorboard
 	# logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
