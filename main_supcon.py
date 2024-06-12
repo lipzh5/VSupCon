@@ -34,7 +34,7 @@ def parse_option():
 
 	parser.add_argument('--print_freq', type=int, default=100,
 						help='print frequency')
-	parser.add_argument('--save_freq', type=int, default=50,
+	parser.add_argument('--save_freq', type=int, default=25,
 						help='save frequency')
 	parser.add_argument('--batch_size', type=int, default=256,
 						help='batch_size')
