@@ -181,7 +181,7 @@ class LinearBatchNorm(nn.Module):
 
 class SupConResNet(nn.Module):
     """backbone + projection head"""
-    def __init__(self, name='resnet50', head='mlp', feat_dim=512):
+    def __init__(self, name='insceptionresnetv1', head='mlp', feat_dim=512, num_classes=7):
         super(SupConResNet, self).__init__()
         model_fun, dim_in = model_dict[name]
         self.encoder = model_fun()
@@ -196,6 +196,8 @@ class SupConResNet(nn.Module):
         else:
             raise NotImplementedError(
                 'head not supported: {}'.format(head))
+        # # joint training
+        # self.classifier = nn.Linear(dim_in, num_classes)
 
     def forward(self, x):
         feat = self.encoder(x)

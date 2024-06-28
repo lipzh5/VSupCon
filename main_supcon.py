@@ -36,15 +36,15 @@ def parse_option():
 						help='print frequency')
 	parser.add_argument('--save_freq', type=int, default=25,
 						help='save frequency')
-	parser.add_argument('--batch_size', type=int, default=256,
+	parser.add_argument('--batch_size', type=int, default=1024, # 256,
 						help='batch_size')
 	parser.add_argument('--num_workers', type=int, default=16,
 						help='num of workers to use')
-	parser.add_argument('--epochs', type=int, default=1000,
+	parser.add_argument('--epochs', type=int, default=100, # 1000,
 						help='number of training epochs')
 
 	# optimization
-	parser.add_argument('--learning_rate', type=float, default=0.05, # 0.05 for resnet50; 0.001 for inceptionresnetv1
+	parser.add_argument('--learning_rate', type=float, default=0.001, # 0.05 for resnet50; 0.001 for inceptionresnetv1
 						help='learning rate')
 	parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900',
 						help='where to decay lr, can be a list')
@@ -56,13 +56,13 @@ def parse_option():
 						help='momentum')
 
 	# model dataset
-	parser.add_argument('--model', type=str, default='resnet50')
-	parser.add_argument('--dataset', type=str, default='cifar10',
+	parser.add_argument('--model', type=str, default='inceptionresnetv1')  # resnet50
+	parser.add_argument('--dataset', type=str, default='affwild2',  # cifar10
 						choices=['cifar10', 'cifar100', 'path', 'affwild2'], help='dataset')
 	parser.add_argument('--mean', type=str, help='mean of dataset in path in form of str tuple')
 	parser.add_argument('--std', type=str, help='std of dataset in path in form of str tuple')
 	parser.add_argument('--data_folder', type=str, default=None, help='path to custom dataset')
-	parser.add_argument('--size', type=int, default=32, help='parameter for RandomResizedCrop')
+	parser.add_argument('--size', type=int, default=160, help='parameter for RandomResizedCrop')  # 32
 
 	# method
 	parser.add_argument('--method', type=str, default='SupCon',
@@ -194,6 +194,7 @@ def set_loader(opt):
 									   transform=TwoCropTransform(val_transform))  
 	elif opt.dataset == 'affwild2':
 		train_dataset = get_affwild2_dataset('train', TwoCropTransform(train_transform), opt.data_dsr)
+		opt.size=160
 		val_dataset = get_affwild2_dataset('val', TwoCropTransform(val_transform), opt.data_dsr)
 	elif opt.dataset == 'cifar100':
 		train_dataset = datasets.CIFAR100(root=opt.data_folder,
@@ -342,7 +343,8 @@ def main():
 	# build optimizer
 	optimizer = set_optimizer(opt, model)
 	total_steps = len(train_loader) * opt.epochs
-	scheduler = transformers.get_linear_schedule_with_warmup(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
+	scheduler_getter = transformer.get_cosine_schedule_with_warmup if opt.cosine else transformers.get_linear_schedule_with_warmup
+	scheduler = scheduler_getter(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
 
 	# tensorboard
 	# logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
