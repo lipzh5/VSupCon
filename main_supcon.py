@@ -343,7 +343,7 @@ def main():
 	# build optimizer
 	optimizer = set_optimizer(opt, model)
 	total_steps = len(train_loader) * opt.epochs
-	scheduler_getter = transformer.get_cosine_schedule_with_warmup if opt.cosine else transformers.get_linear_schedule_with_warmup
+	scheduler_getter = transformers.get_cosine_schedule_with_warmup if opt.cosine else transformers.get_linear_schedule_with_warmup
 	scheduler = scheduler_getter(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
 
 	# tensorboard
