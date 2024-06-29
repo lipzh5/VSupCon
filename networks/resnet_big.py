@@ -151,7 +151,7 @@ def resnet200(**kwargs):
 from facenet_pytorch import InceptionResnetV1
 
 def inceptionresnetv1(**kwargs):
-    return InceptionResnetV1() # pretrained='casia-webface' 
+    return InceptionResnetV1(pretrained='casia-webface') # 
 
 import torchvision.models as models
 model_dict = {
