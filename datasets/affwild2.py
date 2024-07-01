@@ -92,7 +92,7 @@ class AffwildDataset(Dataset):
                         
                         image_name = f'{str(idx).zfill(5)}.jpg'
                         if os.path.isfile(os.path.join(file_folder, vid_name, image_name)):
-                            out_list.append((os.path.join(vid_name, image_name), label)) # tuple
+                            out_list.append((os.path.join(vid_name, image_name), str(label))) # tuple
         if save_path is not None:
             with open(save_path, 'w') as ofile:
                 for path, label in out_list:
