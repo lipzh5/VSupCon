@@ -151,7 +151,7 @@ def resnet200(**kwargs):
 from facenet_pytorch import InceptionResnetV1
 
 def inceptionresnetv1(**kwargs):
-    return InceptionResnetV1(pretrained='casia-webface') # 
+    return InceptionResnetV1() #  pretrained='casia-webface'
 
 import torchvision.models as models
 model_dict = {
@@ -200,7 +200,7 @@ class SupConResNet(nn.Module):
         # self.classifier = nn.Linear(dim_in, num_classes)
 
     def forward(self, x):
-        feat = self.encoder(x)
+        feat = self.encoder(x)  # 512 for inceptionresnetv1 pretrained on casia-webface
         feat = F.normalize(self.head(feat), dim=1)
         return feat
 
