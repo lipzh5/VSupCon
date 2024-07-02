@@ -153,8 +153,8 @@ from facenet_pytorch import InceptionResnetV1
 def inceptionresnetv1(**kwargs):
 	net = InceptionResnetV1() #  pretrained='casia-webface'
 	for name, param in net.named_parameters():
-		if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name:
-				continue
+		if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name or 'bn.' in name:
+			continue
 		if name.endswith('weight'):
 			nn.init.xavier_normal_(param)
 		if name.endswith('bias'):
