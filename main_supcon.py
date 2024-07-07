@@ -370,7 +370,7 @@ def main():
 		if epoch % opt.save_freq == 0:
 			writer.flush()
 			save_file = os.path.join(
-				opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))  # inceptionresnetv1 pretrained using casia-webface
+				opt.save_folder, 'webface_ckpt_epoch_{epoch}.pth'.format(epoch=epoch))  # inceptionresnetv1 pretrained using casia-webface
 			save_model(model, optimizer, opt, epoch, save_file)       
 
 	writer.close()
