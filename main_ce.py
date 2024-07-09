@@ -95,7 +95,7 @@ def parse_option():
 	if opt.warm:
 		opt.model_name = '{}_warm'.format(opt.model_name)
 		opt.warmup_from = 0.01
-		opt.warm_epochs = 10
+		opt.warm_epochs = 1
 		if opt.cosine:
 			eta_min = opt.learning_rate * (opt.lr_decay_rate ** 3)
 			opt.warmup_to = eta_min + (opt.learning_rate - eta_min) * (
@@ -204,7 +204,7 @@ def set_model(opt):
 	return model, criterion
 
 
-def train(train_loader, model, criterion, optimizer, epoch, opt):
+def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 	"""one epoch training"""
 	model.train()
 
@@ -222,7 +222,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
 		bsz = labels.shape[0]
 
 		# warm-up learning rate
-		warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+		# warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
 
 		# compute loss
 		output = model(images)
@@ -237,6 +237,7 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
 		optimizer.zero_grad()
 		loss.backward()
 		optimizer.step()
+		scheduler.step()
 
 		# measure elapsed time
 		batch_time.update(time.time() - end)
@@ -318,6 +319,9 @@ def main():
 
 	# build optimizer
 	optimizer = set_optimizer(opt, model)
+	total_steps = len(train_loader) * opt.epochs
+	scheduler_getter = transformers.get_cosine_schedule_with_warmup if opt.cosine else transformers.get_linear_schedule_with_warmup
+	scheduler = scheduler_getter(optimizer=optimizer, num_warmup_steps=opt.warm_epochs*len(train_loader), num_training_steps=total_steps)
 
 	# tensorboard
 	# logger = tb_logger.Logger(logdir=opt.tb_folder, flush_secs=2)
@@ -328,7 +332,7 @@ def main():
 
 		# train for one epoch
 		time1 = time.time()
-		loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, opt)
+		loss, train_acc = train(train_loader, model, criterion, optimizer, scheduler, epoch, opt)
 		time2 = time.time()
 		print('epoch {}, total time {:.2f}'.format(epoch, time2 - time1))
 
