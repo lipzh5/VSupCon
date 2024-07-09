@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os
+import os.path as osp
 import sys
 import argparse
 import time
@@ -62,6 +63,7 @@ def parse_option():
 						help='using synchronized batch normalization')
 	parser.add_argument('--warm', action='store_true',
 						help='warm-up for large batch training')
+	parser.add_argument('--warm_epochs', type=int, default=1)
 	parser.add_argument('--trial', type=str, default='0',
 						help='id for recording multiple runs')
 	parser.add_argument('--device_id', type=int, default=0)
@@ -304,7 +306,7 @@ def main():
 	opt = parse_option()
 	trial_name = f"m{opt.model}_lr{opt.learning_rate}__decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
-	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
+	# log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 
 
