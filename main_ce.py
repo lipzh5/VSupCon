@@ -302,7 +302,7 @@ def validate(val_loader, model, criterion, opt):
 def main():
 	best_acc = 0
 	opt = parse_option()
-	trial_name = f"m{opt.model}_lr{opt.learning_rate}_dflr-{opt.dflr}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
+	trial_name = f"m{opt.model}_lr{opt.learning_rate}__decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
 	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
