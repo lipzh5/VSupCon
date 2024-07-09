@@ -112,11 +112,11 @@ def get_paramsgroup(opt, model, warmup=False):
 def set_optimizer(opt, model):
     # return optim.AdamW(get_paramsgroup(opt, model)) if opt.dflr else optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
   
-    # optimizer = optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
-    optimizer = optim.SGD(model.parameters(),
-                          lr=opt.learning_rate,
-                          momentum=opt.momentum,
-                          weight_decay=opt.weight_decay)
+    optimizer = optim.AdamW(model.parameters(), lr=opt.learning_rate, weight_decay=opt.weight_decay)
+    # optimizer = optim.SGD(model.parameters(),
+    #                       lr=opt.learning_rate,
+    #                       momentum=opt.momentum,
+    #                       weight_decay=opt.weight_decay)
     return optimizer
 
 
