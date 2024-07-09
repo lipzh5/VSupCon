@@ -70,7 +70,7 @@ def parse_option():
 	parser.add_argument('--device_id', type=int, default=0)
 	parser.add_argument('--image_size', type=int, default=160)  # 160 for affwild2, 32 for cifar
 	parser.add_argument('--data_dsr', type=int, default=1, help='data set downsampling ratio, e.g., 1 stands for original, 2 stands for original//2')
-
+	parser.add_argument('--use_webface_pretrain', action='store_true')
 	opt = parser.parse_args()
 
 	# set the path according to the environment
@@ -188,7 +188,7 @@ def set_loader(opt):
 
 
 def set_model(opt):
-	model = SupCEResNet(name=opt.model, num_classes=opt.n_cls)
+	model = SupCEResNet(name=opt.model, num_classes=opt.n_cls, use_webface_pretrain=opt.use_webface_pretrain)
 	criterion = torch.nn.CrossEntropyLoss()
 
 	# enable synchronized Batch Normalization
@@ -306,7 +306,7 @@ def validate(val_loader, model, criterion, opt):
 def main():
 	best_acc = 0
 	opt = parse_option()
-	trial_name = f"m{opt.model}_lr{opt.learning_rate}__decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
+	trial_name = f"m{opt.model}_lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_webface{int(opt.use_webface_pretrain)}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
 	# log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")

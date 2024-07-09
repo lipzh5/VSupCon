@@ -151,7 +151,9 @@ def resnet200(**kwargs):
 from facenet_pytorch import InceptionResnetV1
 
 def inceptionresnetv1(**kwargs):
-	net = InceptionResnetV1(pretrained='casia-webface') #  
+	use_webface_pretrain = kwargs.get('use_webface_pretrain', False)
+	print(f'inceptionresnetv1 use webface pretrain: {use_webface_pretrain} \n ****')
+	net = InceptionResnetV1(pretrained='casia-webface') if use_webface_pretrain else InceptionResnetV1() 
 	for name, param in net.named_parameters():
 		if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name or 'bn.' in name:
 			continue
@@ -215,10 +217,10 @@ class SupConResNet(nn.Module):
 
 class SupCEResNet(nn.Module):
 	"""encoder + classifier"""
-	def __init__(self, name='resnet50', num_classes=10):
+	def __init__(self, name='resnet50', num_classes=10, use_webface_pretrain=False):  # TODO penny note: only for inceptionresnetv1
 		super(SupCEResNet, self).__init__()
 		model_fun, dim_in = model_dict[name]
-		self.encoder = model_fun()
+		self.encoder = model_fun(use_webface_pretrain=use_webface_pretrain)
 		self.fc = nn.Linear(dim_in, num_classes)
 
 	def forward(self, x):
