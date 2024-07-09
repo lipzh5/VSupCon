@@ -341,7 +341,7 @@ def main():
 
 		# evaluation
 		loss, val_acc, wf = validate(val_loader, model, criterion, opt)
-		writer.add_scalar("Loss/val", val_loss, epoch)
+		writer.add_scalar("Loss/val", loss, epoch)
 		writer.add_scalar("WF/val", wf, epoch)
 		# logger.log_value('val_loss', loss, epoch)
 		# logger.log_value('val_acc', val_acc, epoch)
