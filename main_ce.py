@@ -11,6 +11,7 @@ import math
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
+import transformers
 from torch.utils.tensorboard import SummaryWriter
 
 from util import AverageMeter
