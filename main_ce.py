@@ -10,6 +10,7 @@ import math
 import torch
 import torch.backends.cudnn as cudnn
 from torchvision import transforms, datasets
+from torch.utils.tensorboard import SummaryWriter
 
 from util import AverageMeter
 from util import adjust_learning_rate, warmup_learning_rate, accuracy
@@ -295,12 +296,17 @@ def validate(val_loader, model, criterion, opt):
 	wf = eval_meld(torch.cat(all_logits), torch.cat(all_truths))
 	print(f'WF : {wf} \n *******')
 
-	return losses.avg, top1.avg
+	return losses.avg, top1.avg, wf
 
 
 def main():
 	best_acc = 0
 	opt = parse_option()
+	trial_name = f"m{opt.model}_lr{opt.learning_rate}_dflr-{opt.dflr}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
+	writer = SummaryWriter(osp.join('runs',trial_name))
+	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
+	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
+
 
 	# build data loader
 	train_loader, val_loader = set_loader(opt)
@@ -328,9 +334,13 @@ def main():
 		# logger.log_value('train_loss', loss, epoch)
 		# logger.log_value('train_acc', train_acc, epoch)
 		# logger.log_value('learning_rate', optimizer.param_groups[0]['lr'], epoch)
+		writer.add_scalar("Loss/train", loss, epoch)
+		
 
 		# evaluation
-		loss, val_acc = validate(val_loader, model, criterion, opt)
+		loss, val_acc, wf = validate(val_loader, model, criterion, opt)
+		writer.add_scalar("Loss/val", val_loss, epoch)
+		writer.add_scalar("WF/val", wf, epoch)
 		# logger.log_value('val_loss', loss, epoch)
 		# logger.log_value('val_acc', val_acc, epoch)
 
@@ -338,6 +348,7 @@ def main():
 			best_acc = val_acc
 
 		if epoch % opt.save_freq == 0:
+			writer.flush()
 			save_file = os.path.join(
 				opt.save_folder, 'ckpt_epoch_{epoch}.pth'.format(epoch=epoch))
 			save_model(model, optimizer, opt, epoch, save_file)
