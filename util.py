@@ -4,6 +4,7 @@ import math
 import numpy as np
 import torch
 import torch.optim as optim
+from sklearn.metrics import f1_score
 
 
 class TwoCropTransform:
@@ -131,3 +132,23 @@ def save_model(model, optimizer, opt, epoch, save_file):
     }
     torch.save(state, save_file)
     del state
+
+
+def eval_meld(results, truths, test=False, return_all=False):
+    test_preds = results.cpu().detach().numpy()   #（num_utterance, num_label)
+    test_truth = truths.cpu().detach().numpy()  #（num_utterance）
+    predicted_label = []
+    true_label = []
+    for i in range(test_preds.shape[0]):
+        predicted_label.append(np.argmax(test_preds[i,:],axis=0) ) #
+        true_label.append(test_truth[i])
+    wg_av_f1 = f1_score(true_label, predicted_label, average='weighted')
+    # if test:
+    f1_each_label = f1_score(true_label, predicted_label, average=None)
+    test_str = 'TEST' if test else 'EVAL'
+    print(f'**{test_str}** | f1 on each class (Neutral, Surprise, Fear, Sadness, Joy, Disgust, Anger): \n', f1_each_label)
+    if return_all:
+        return wg_av_f1, f1_each_label
+    return wg_av_f1 
+
+
