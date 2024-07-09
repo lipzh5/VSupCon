@@ -214,8 +214,8 @@ def train(train_loader, model, criterion, optimizer, epoch, opt):
 	for idx, (images, labels) in enumerate(train_loader):
 		data_time.update(time.time() - end)
 
-		images = images.cuda(non_blocking=True)
-		labels = labels.cuda(non_blocking=True)
+		images = images.cuda(device=opt.device_id, non_blocking=True)
+		labels = labels.cuda(device=opt.device_id, non_blocking=True)
 		bsz = labels.shape[0]
 
 		# warm-up learning rate
@@ -264,8 +264,8 @@ def validate(val_loader, model, criterion, opt):
 	with torch.no_grad():
 		end = time.time()
 		for idx, (images, labels) in enumerate(val_loader):
-			images = images.float().cuda()
-			labels = labels.cuda()
+			images = images.float().cuda(opt.device_id)
+			labels = labels.cuda(opt.device_id)
 			bsz = labels.shape[0]
 
 			# forward
