@@ -154,7 +154,7 @@ def inceptionresnetv1(**kwargs):
 	use_webface_pretrain = kwargs.get('use_webface_pretrain', False)
 	net = InceptionResnetV1(pretrained='casia-webface') if use_webface_pretrain else InceptionResnetV1() 
 	weight_init = kwargs.get('weight_init', False)
-	print(f'inceptionresnetv1 use webface pretrain: {use_webface_pretrain} \n --------\n apply weight init: {weight_init} \n****')
+	print(f'inceptionresnetv1 use webface pretrain: {use_webface_pretrain} \n --------\napply weight init: {weight_init} \n****')
 	if not weight_init:
 		return net
 	for name, param in net.named_parameters():
