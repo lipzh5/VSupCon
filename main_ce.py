@@ -307,7 +307,7 @@ def validate(val_loader, model, criterion, opt):
 def main():
 	best_acc = 0
 	opt = parse_option()
-	trial_name = f"m{opt.model}_winit{opt.weight_init}_lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_webface{int(opt.use_webface_pretrain)}_trial{opt.trial}"
+	trial_name = f"m{opt.model}_winit{int(opt.weight_init)}_lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_webface{int(opt.use_webface_pretrain)}_trial{opt.trial}"
 	writer = SummaryWriter(osp.join('runs',trial_name))
 	# log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
