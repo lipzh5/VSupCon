@@ -34,7 +34,7 @@ def parse_option():
 
 	parser.add_argument('--print_freq', type=int, default=100,
 						help='print frequency')
-	parser.add_argument('--save_freq', type=int, default=25,
+	parser.add_argument('--save_freq', type=int, default=50,
 						help='save frequency')
 	parser.add_argument('--batch_size', type=int, default=1024, # 256,
 						help='batch_size')
@@ -44,7 +44,7 @@ def parse_option():
 						help='number of training epochs')
 
 	# optimization
-	parser.add_argument('--learning_rate', type=float, default=0.001, # 0.05 for resnet50; 0.001 for inceptionresnetv1
+	parser.add_argument('--learning_rate', type=float, default=0.0001, # 0.05 for resnet50; 0.001 for inceptionresnetv1
 						help='learning rate')
 	parser.add_argument('--lr_decay_epochs', type=str, default='700,800,900',
 						help='where to decay lr, can be a list')
@@ -81,11 +81,13 @@ def parse_option():
 						help='warm-up for large batch training')
 	parser.add_argument('--trial', type=str, default='0',
 						help='id for recording multiple runs')
-	parser.add_argument('--device_ids', default='1,2')
+	parser.add_argument('--device_id', type=int, default=0)
 	parser.add_argument('--data_dsr', type=int, default=1, help='data set downsampling ratio, e.g., 1 stands for original, 2 stands for original//2')
 	parser.add_argument('--warmup_from', type=float, default=1e-3)
 	parser.add_argument('--warm_epochs', type=int, default=10)
 	parser.add_argument('--dflr', action='store_true', default=False, help='whether to use different lr for encoder and head')
+	parser.add_argument('--use_webface_pretrain', action='store_true')
+	parser.add_argument('--weight_init', action='store_true', help='using customized weight init')
 
 	opt = parser.parse_args()
 
@@ -106,8 +108,8 @@ def parse_option():
 	for it in iterations:
 		opt.lr_decay_epochs.append(int(it))
 	
-	device_ids = opt.device_ids.split(',')
-	opt.device_ids = [int(it) for it in device_ids]
+	# device_ids = opt.device_ids.split(',')
+	# opt.device_ids = [int(it) for it in device_ids]
 
 	opt.model_name = '{}_{}_{}_lr_{}_decay_{}_bsz_{}_temp_{}_trial_{}'.\
 		format(opt.method, opt.dataset, opt.model, opt.learning_rate,
@@ -220,7 +222,7 @@ def set_loader(opt):
 
 def set_model(opt):
 	model = SupConResNet(name=opt.model, feat_dim=512)
-	device_id = opt.device_ids[0]
+	device_id = opt.device_id
 	criterion = SupConLoss(temperature=opt.temp, device_id=device_id)
 
 	# enable synchronized Batch Normalization
@@ -244,7 +246,7 @@ def validate(val_loader, model, criterion, opt):
 	for idx, (images, labels) in enumerate(val_loader):
 		images = torch.cat([images[0], images[1]], dim=0)
 		if torch.cuda.is_available():
-			device_id = opt.device_ids[0]
+			device_id = opt.device_id
 			images = images.cuda(device=device_id, non_blocking=True)
 			labels = labels.cuda(device=device_id, non_blocking=True)
 		bsz = labels.shape[0]
@@ -280,7 +282,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 
 		images = torch.cat([images[0], images[1]], dim=0)
 		if torch.cuda.is_available():
-			device_id = opt.device_ids[0]
+			device_id = opt.device_id
 			images = images.cuda(device=device_id, non_blocking=True)
 			labels = labels.cuda(device=device_id, non_blocking=True)
 		bsz = labels.shape[0]
@@ -330,7 +332,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 def main():
 	opt = parse_option()
 	trial_name = f"m{opt.model}_lr{opt.learning_rate}_dflr-{opt.dflr}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_opt-AdamW_sch-linwp{opt.warm_epochs}_trial{opt.trial}"
-	writer = SummaryWriter(osp.join('runs',trial_name))
+	writer = SummaryWriter(osp.join('runs/supcon',trial_name))
 	log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 

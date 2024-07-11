@@ -33,15 +33,15 @@ def parse_option():
 						help='print frequency')
 	parser.add_argument('--save_freq', type=int, default=50,
 						help='save frequency')
-	parser.add_argument('--batch_size', type=int, default=256,
+	parser.add_argument('--batch_size', type=int, default=1024,
 						help='batch_size')
 	parser.add_argument('--num_workers', type=int, default=16,
 						help='num of workers to use')
-	parser.add_argument('--epochs', type=int, default=500,
+	parser.add_argument('--epochs', type=int, default=100,
 						help='number of training epochs')
 
 	# optimization
-	parser.add_argument('--learning_rate', type=float, default=0.001,
+	parser.add_argument('--learning_rate', type=float, default=1e-6,
 						help='learning rate')
 	parser.add_argument('--lr_decay_epochs', type=str, default='350,400,450',
 						help='where to decay lr, can be a list')
@@ -308,7 +308,7 @@ def main():
 	best_acc = 0
 	opt = parse_option()
 	trial_name = f"m{opt.model}_winit{int(opt.weight_init)}_lr{opt.learning_rate}_decay{opt.weight_decay}_bs{opt.batch_size}_ep{opt.epochs}_webface{int(opt.use_webface_pretrain)}_trial{opt.trial}"
-	writer = SummaryWriter(osp.join('runs',trial_name))
+	writer = SummaryWriter(osp.join('runs/ce',trial_name))
 	# log.info(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 	print(f"***********\n TRIAL: {trial_name}\n STARTS!***********")
 

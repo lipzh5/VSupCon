@@ -155,7 +155,7 @@ def inceptionresnetv1(**kwargs):
 	net = InceptionResnetV1(pretrained='casia-webface') if use_webface_pretrain else InceptionResnetV1() 
 	weight_init = kwargs.get('weight_init', False)
 	print(f'inceptionresnetv1 use webface pretrain: {use_webface_pretrain} \n --------\napply weight init: {weight_init} \n****')
-	if not weight_init:
+	if use_webface_pretrain or not weight_init:  # penny note: if use webface pretrain, then no need to apply customized init
 		return net
 	for name, param in net.named_parameters():
 		if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name or 'bn.' in name:
@@ -194,10 +194,10 @@ class LinearBatchNorm(nn.Module):
 
 class SupConResNet(nn.Module):
 	"""backbone + projection head"""
-	def __init__(self, name='insceptionresnetv1', head='mlp', feat_dim=512, num_classes=7):
+	def __init__(self, name='insceptionresnetv1', head='mlp', feat_dim=512, num_classes=7, use_webface_pretrain=False, weight_init=False):
 		super(SupConResNet, self).__init__()
 		model_fun, dim_in = model_dict[name]
-		self.encoder = model_fun()
+		self.encoder = model_fun(use_webface_pretrain=use_webface_pretrain, weight_init=weight_init)
 		if head == 'linear':
 			self.head = nn.Linear(dim_in, feat_dim)
 		elif head == 'mlp':
