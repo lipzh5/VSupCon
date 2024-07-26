@@ -155,16 +155,18 @@ def inceptionresnetv1(**kwargs):
 	net = InceptionResnetV1(pretrained='casia-webface') if use_webface_pretrain else InceptionResnetV1() 
 	weight_init = kwargs.get('weight_init', False)
 	print(f'inceptionresnetv1 use webface pretrain: {use_webface_pretrain} \n --------\napply weight init: {weight_init} \n****')
-	if use_webface_pretrain or not weight_init:  # penny note: if use webface pretrain, then no need to apply customized init
-		return net
-	for name, param in net.named_parameters():
-		if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name or 'bn.' in name:
-			continue
-		if name.endswith('weight'):
-			nn.init.xavier_normal_(param)
-		if name.endswith('bias'):
-			nn.init.zeros_(param)
 	return net
+	# if use_webface_pretrain or not weight_init:  # penny note: if use webface pretrain, then no need to apply customized init
+	# 	return net
+	
+	# for name, param in net.named_parameters():
+	# 	if name.endswith('LayerNorm.weight') or name.endswith('LayerNorm.bias') or 'layer_norm' in name or 'bn.' in name:
+	# 		continue
+	# 	if name.endswith('weight'):
+	# 		nn.init.xavier_normal_(param)
+	# 	if name.endswith('bias'):
+	# 		nn.init.zeros_(param)
+	# return net
 
 import torchvision.models as models
 model_dict = {

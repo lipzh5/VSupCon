@@ -21,7 +21,8 @@ class AffwildDataset(Dataset):
         # class_names_original = ['Neutral', 'Anger', 'Disgust', 'Fear', 'Happiness', 'Sadness', 'Surprise', 'Other']  #ABAW3的标注
 
         # label_index = {'neutral': 0, 'surprise': 1, 'fear': 2, 'sadness': 3, 'joy': 4, 'disgust': 5, 'anger': 6}  #MELD的标注
-        class_mapping = [0, 6, 5, 2, 4, 3, 1, 7]  
+        # class_mapping = [0, 6, 5, 2, 4, 3, 1, 7]  
+        class_mapping = [0, 0, 2, 1, 0, 0, 0, ]  # x,x, 2 , 1, x, x,x refomulate the class mapping
 
         self.downsampling = downsampling   # TODO delete later: test data set downsampling to speed up training
         self.split = split

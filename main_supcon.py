@@ -32,7 +32,7 @@ except ImportError:
 def parse_option():
 	parser = argparse.ArgumentParser('argument for training')
 
-	parser.add_argument('--print_freq', type=int, default=100,
+	parser.add_argument('--print_freq', type=int, default=200,
 						help='print frequency')
 	parser.add_argument('--save_freq', type=int, default=50,
 						help='save frequency')
@@ -156,6 +156,7 @@ def set_loader(opt):
 		if opt.model == 'inceptionresnetv1': 
 			mean = (0.4654, 0.3532, 0.3217)
 			std = (0.2334, 0.2003, 0.1902)
+			opt.size = 160
 		else:  # original size 
 			mean = (0.4652, 0.3531, 0.3215)
 			std = (0.2348, 0.2019, 0.1918)
@@ -196,7 +197,6 @@ def set_loader(opt):
 									   transform=TwoCropTransform(val_transform))  
 	elif opt.dataset == 'affwild2':
 		train_dataset = get_affwild2_dataset('train', TwoCropTransform(train_transform), opt.data_dsr)
-		opt.size=160
 		val_dataset = get_affwild2_dataset('val', TwoCropTransform(val_transform), opt.data_dsr)
 	elif opt.dataset == 'cifar100':
 		train_dataset = datasets.CIFAR100(root=opt.data_folder,
@@ -221,7 +221,7 @@ def set_loader(opt):
 
 
 def set_model(opt):
-	model = SupConResNet(name=opt.model, feat_dim=512)
+	model = SupConResNet(name=opt.model, feat_dim=512, use_webface_pretrain=opt.use_webface_pretrain, num_classes=3)  # todo modify classes for pretrained
 	device_id = opt.device_id
 	criterion = SupConLoss(temperature=opt.temp, device_id=device_id)
 
@@ -288,7 +288,7 @@ def train(train_loader, model, criterion, optimizer, scheduler, epoch, opt):
 		bsz = labels.shape[0]
 
 		# warm-up learning rate
-		warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
+		# warmup_learning_rate(opt, epoch, idx, len(train_loader), optimizer)
 
 		# compute loss
 		features = model(images)
