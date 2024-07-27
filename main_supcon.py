@@ -221,7 +221,7 @@ def set_loader(opt):
 
 
 def set_model(opt):
-	model = SupConResNet(name=opt.model, feat_dim=512, use_webface_pretrain=opt.use_webface_pretrain, num_classes=3)  # todo modify classes for pretrained
+	model = SupConResNet(name=opt.model, feat_dim=512, use_webface_pretrain=opt.use_webface_pretrain)  # todo modify classes for pretrained
 	device_id = opt.device_id
 	criterion = SupConLoss(temperature=opt.temp, device_id=device_id)
 
