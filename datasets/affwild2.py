@@ -28,7 +28,7 @@ class AffwildDataset(Dataset):
         self.split = split
         # if is_train:
         print('load Aff-Wild2_train...')
-        data_list_path = osp.join(data_list_dir, f'{split}_img_path_list.txt')
+        data_list_path = osp.join(data_list_dir, f'{split}_masked_img_path_list.txt')
         anno_folder = osp.join(anno_folder, f'{split}_set')
 
         self.data_list = []
@@ -107,6 +107,7 @@ cwd = osp.abspath(osp.dirname(__file__))
 def get_affwild2_dataset(split, transform_ops, downsampling=1):
     root_path = osp.join(cwd, '../../common/data/aff-wild2') # '/home/penny/pycharmprojects/common/data/aff-wild2'
     data_list_dir = osp.join(root_path, 'preprocessed_data')
-    data_folder = osp.join(root_path, 'cropped_all/cropped_aligned')
+    # data_folder = osp.join(root_path, 'cropped_all/cropped_aligned')
+    data_folder = osp.join(root_path, 'openface_masked_cropped')
     anno_folder = osp.join(root_path, '5th_ABAW_Annotations/EXPR_Classification_Challenge')
     return AffwildDataset(data_list_dir, data_folder, anno_folder, split, transform_ops, downsampling)

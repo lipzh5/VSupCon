@@ -154,8 +154,12 @@ def set_loader(opt):
 		std = (0.2675, 0.2565, 0.2761)
 	elif opt.dataset == 'affwild2':  
 		if opt.model == 'inceptionresnetv1': 
-			mean = (0.4654, 0.3532, 0.3217)
-			std = (0.2334, 0.2003, 0.1902)
+			'''masked cropped image'''
+			mean =  (0.0722, 0.0489, 0.0451)
+			std = (0.1807, 0.1274, 0.1169)
+
+			# mean = (0.4654, 0.3532, 0.3217)
+			# std = (0.2334, 0.2003, 0.1902)
 			opt.size = 160
 		else:  # original size 
 			mean = (0.4652, 0.3531, 0.3215)
