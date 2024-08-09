@@ -199,7 +199,10 @@ class SupConResNet(nn.Module):
 	def __init__(self, name='insceptionresnetv1', head='mlp', feat_dim=512, num_classes=7, use_webface_pretrain=False, weight_init=False):
 		super(SupConResNet, self).__init__()
 		model_fun, dim_in = model_dict[name]
-		self.encoder = model_fun()
+		if name == 'inceptionresnetv1':
+			self.encoder = model_fun(use_webface_pretrain=use_webface_pretrain)
+		else:
+			self.encoder = model_fun()
 		if head == 'linear':
 			self.head = nn.Linear(dim_in, feat_dim)
 		elif head == 'mlp':
